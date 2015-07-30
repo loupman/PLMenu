@@ -14,6 +14,7 @@
 
 @interface ViewController ()<PLMenuProtocol>
 {
+    PLMenu *_menuWithMark;
 }
 
 @end
@@ -33,12 +34,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor lightGrayColor];
     
     UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 20, kScreenWidth, 44)];
     [self.view addSubview: navigationBar];
     
     UIButton *navButton= [UIButton buttonWithType:UIButtonTypeContactAdd];
-    [navButton addTarget:self action:@selector(showMenu:) forControlEvents:UIControlEventTouchUpInside];
+    [navButton addTarget:self action:@selector(showMenu1:) forControlEvents:UIControlEventTouchUpInside];
     navButton.tag = 1001;
     UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:navButton];
     
@@ -65,6 +67,15 @@
     PLMenu *_menu = [[PLMenu alloc] initWithDelegate:self menuItems:@[@"添加好友", @"扫一扫"] images:@[@"nav_bar_user_icon", @"nav_chat_end_relation"]];
     _menu.tag = sender.tag;
     [_menu showInView: sender];
+}
+
+-(void) showMenu1:(UIButton *) sender
+{
+    if (!_menuWithMark) {
+        _menuWithMark = [[PLMenu alloc] initWithDelegate:self menuItems:@[@"添加好友", @"扫一扫"] selectedIndex:0];
+    }
+    _menuWithMark.tag = sender.tag;
+    [_menuWithMark showInView: sender];
 }
 
 - (void)didReceiveMemoryWarning {

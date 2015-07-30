@@ -9,11 +9,15 @@
 #import "PLMenu.h"
 #import "AppDelegate.h"
 
+const NSInteger MENU_ITEM_HEIGHT       =  40;
+const NSInteger MENU_WIDTH             =  135;
+const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
+
 @implementation PLMenu {
     UITableView *menu;
     NSArray *titleItems;
     NSArray *titleImages;
-    NSString *selectedItem;
+    NSIndexPath *selectedIndex;
     NSIndexPath *previousSelectedIndex;
     
     UIImageView *imgViewSelectedItemCheckMark;
@@ -22,23 +26,18 @@
     BOOL isDisplayed;
 }
 
-/*
- // Only override drawRect: if you perform custom drawing.
- // An empty implementation adversely affects performance during animation.
- - (void)drawRect:(CGRect)rect {
- // Drawing code
- }
- */
-const NSInteger MENU_ITEM_HEIGHT =  40;
-const NSInteger MENU_WIDTH       =  130;
-
-- (instancetype) initWithDelegate:(id)del menuItems:(NSArray *)menuItems selectedItem:(NSString *) item {
+- (instancetype) initWithDelegate:(id)delegate menuItems:(NSArray *)menuItems selectedIndex:(NSInteger) index{
     if (self = [self init]) {
-        self.delegate = del;
+        if (!menuItems) {
+            NSLog(@"menuItems should not be nil.");
+            return nil;
+        }
+        
+        self.delegate = delegate;
         titleItems = menuItems;
         
         previousSelectedIndex = nil;
-        selectedItem = item;
+        selectedIndex = [NSIndexPath indexPathForRow:index inSection:0];
         
         [self initializer];
         [self addSubview: menu];
@@ -50,18 +49,19 @@ const NSInteger MENU_WIDTH       =  130;
     return nil;
 }
 
-- (instancetype) initWithDelegate:(id)del menuItems:(NSArray *)menuItems images:(NSArray *) images
+- (instancetype) initWithDelegate:(id)delegate menuItems:(NSArray *)menuItems images:(NSArray *) images
 {
     if (self = [self init]) {
-        if (menuItems.count != images.count) {
+        if (!menuItems) {
+            NSLog(@"menuItems should not be nil.");
             return nil;
         }
         titleItems = menuItems;
         titleImages = images;
-        self.delegate = del;
+        self.delegate = delegate;
         
         previousSelectedIndex = nil;
-        selectedItem = nil;
+        selectedIndex = nil;
         
         [self initializer];
         [self addSubview: menu];
@@ -86,11 +86,16 @@ const NSInteger MENU_WIDTH       =  130;
     self.layer.opacity = 0.5;
     self.layer.shadowRadius = 10;
     
-    menu = [[UITableView alloc] initWithFrame:CGRectMake(0, imgViewArrow.image.size.height, MENU_WIDTH, self.frame.size.height - imgViewArrow.image.size.height) style:UITableViewStyleGrouped];
+    menu = [[UITableView alloc] initWithFrame:CGRectMake(0, imgViewArrow.image.size.height, MENU_WIDTH, MENU_ITEM_HEIGHT * [titleItems count]) style:UITableViewStyleGrouped];
     menu.separatorStyle = UITableViewCellSeparatorStyleSingleLineEtched;
     menu.separatorColor = [UIColor darkGrayColor];
-    menu.backgroundColor = [UIColor blueColor];;
-    menu.scrollEnabled = NO;
+    menu.backgroundColor = [UIColor whiteColor];;
+    menu.scrollEnabled = YES;
+    if (titleItems && [titleItems count] >= MENU_MAX_ITEM_NUMBER) {
+        menu.scrollEnabled = YES;
+        menu.bounces = NO;
+        menu.showsVerticalScrollIndicator = NO;
+    }
     menu.delegate = self;
     menu.dataSource = self;
     menu.layer.masksToBounds = YES;
@@ -131,8 +136,7 @@ const NSInteger MENU_WIDTH       =  130;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
-    static NSString *CellWithIdentifier = @"Cell";
+    static NSString *CellWithIdentifier = @"MenuCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellWithIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellWithIdentifier];
@@ -144,20 +148,21 @@ const NSInteger MENU_WIDTH       =  130;
     UIImage *bg = [[UIImage imageNamed:@"nav_top_bg"] stretchableImageWithLeftCapWidth:0.5 topCapHeight:0.5];
     [cell setBackgroundView: [[UIImageView alloc] initWithImage: bg]];
     cell.accessoryType = UITableViewCellAccessoryNone;
+    cell.accessoryView = nil;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
-    id image = titleImages[[indexPath row]];
-    if ([image isKindOfClass:UIImage.class]) {
-        cell.imageView.image = image;
-    } else if ([image isKindOfClass:NSString.class]) {
-        cell.imageView.image = [UIImage imageNamed:image];
+    if (titleImages && [titleImages count] > [indexPath row]) {
+        id image = titleImages[[indexPath row]];
+        if ([image isKindOfClass:UIImage.class]) {
+            cell.imageView.image = image;
+        } else if ([image isKindOfClass:NSString.class]) {
+            cell.imageView.image = [UIImage imageNamed:image];
+        }
     }
     
-    if (selectedItem != nil && [selectedItem isEqualToString:titleItems[[indexPath row]]]) {
-        [tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionTop];
-        cell.accessoryView = imgViewSelectedItemCheckMark;
-        
-        cell.textLabel.textColor = [UIColor whiteColor];
+    if (selectedIndex && [selectedIndex row] == [indexPath row]) {
+        cell.accessoryView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"selected_icon"]];
+        cell.textLabel.textColor = [UIColor yellowColor];
         previousSelectedIndex = indexPath;
     }
     
@@ -181,6 +186,7 @@ const NSInteger MENU_WIDTH       =  130;
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    selectedIndex = indexPath;
     if ([self.delegate respondsToSelector:@selector(didSelectRowOnIndexPath:withTitle:)]) {
         [self.delegate didSelectRowOnIndexPath:indexPath withTitle:titleItems[[indexPath row]]];
     }
@@ -196,6 +202,9 @@ const NSInteger MENU_WIDTH       =  130;
 
 - (void)show
 {
+    if (menu) {
+        [menu reloadData];
+    }
     overlayView.hidden = NO;
     self.hidden = NO;
     
@@ -208,6 +217,7 @@ const NSInteger MENU_WIDTH       =  130;
 
 - (void)fadeIn
 {
+    self.userInteractionEnabled = YES;
     self.transform = CGAffineTransformMakeScale(.2f, .2f);
     self.alpha = 0;
     [UIView animateWithDuration:.25 animations:^{
@@ -269,8 +279,7 @@ const NSInteger MENU_WIDTH       =  130;
 }
 
 /**
- *  计算一个view相对于屏幕(去除顶部statusbar的20像素)的坐标
- *  iOS7下UIViewController.view是默认全屏的，要把这20像素考虑进去
+ *  计算一个view相对于屏幕(去除顶部statusbar的20像素)的坐标, iOS7及以上的UIViewController.view是默认全屏的，要把这20像素考虑进去。
  */
 - (CGPoint)relativePositionToScreenWithView:(UIView *)v
 {
@@ -295,4 +304,5 @@ const NSInteger MENU_WIDTH       =  130;
     }
     return CGPointMake(x, y);
 }
+
 @end

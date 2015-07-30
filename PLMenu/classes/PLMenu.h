@@ -28,12 +28,34 @@
 }
 
 @property(nonatomic, assign) id<PLMenuProtocol> delegate;
+//@property(nonatomic, assign) BOOL shouldShowCheckMarkAfterBeingSelected;
 
-- (instancetype) initWithDelegate:(id)del menuItems:(NSArray *)menuItems selectedItem:(NSString *) selectedItem;
-- (instancetype) initWithDelegate:(id)del menuItems:(NSArray *)menuItems images:(NSArray *) images;
+
+/**
+ *  This method is used to create an instance with a check mark on a selected row
+ *
+ *  @param delegate     A delegate which implement PLMenuProtocol
+ *  @param menuItems    Menu items to show
+ *  @param index        Will show a checkmark in selected index for default.
+ *
+ *  @return PLMenu instance
+ */
+
+- (instancetype) initWithDelegate:(id)delegate menuItems:(NSArray *)menuItems selectedIndex:(NSInteger) index;
+
+/**
+ *  This method is used to create an instance with an image on the beginning of each row
+ *  You can pass parameter images as an array of images or image urls.
+ *
+ *  @param delegate    A delegate which implement PLMenuProtocol
+ *  @param menuItems   Menu items to show
+ *  @param images      Images or image urls that will be shown on each row. can be nil
+ *
+ *  @return PLMenu instance
+ */
+- (instancetype) initWithDelegate:(id)delegate menuItems:(NSArray *)menuItems images:(NSArray *) images;
 
 - (void) showInView:(UIView *) view;
-
 - (void) dismiss;
 
 @end
