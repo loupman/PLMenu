@@ -78,13 +78,17 @@ const NSInteger MENU_WIDTH       =  130;
     imgViewSelectedItemCheckMark = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"selected_icon"]];
     imgViewArrow = [[UIImageView alloc] initWithImage: [UIImage imageNamed:@"nav_menu_triangle_icon"]];
     
-    self.frame = CGRectMake(0, 0, MENU_WIDTH, MENU_ITEM_HEIGHT * [titleItems count] + imgViewArrow.image.size.height);
+    self.frame = CGRectMake(0, 0, MENU_WIDTH, MENU_ITEM_HEIGHT * [titleItems count] + imgViewArrow.image.size.height - 2);
     self.layer.masksToBounds = YES;
     self.layer.cornerRadius = 2;
     self.backgroundColor = [UIColor clearColor];
+    self.layer.shadowColor = [[UIColor lightGrayColor] CGColor];
+    self.layer.opacity = 0.5;
+    self.layer.shadowRadius = 10;
     
     menu = [[UITableView alloc] initWithFrame:CGRectMake(0, imgViewArrow.image.size.height, MENU_WIDTH, self.frame.size.height - imgViewArrow.image.size.height) style:UITableViewStyleGrouped];
     menu.separatorStyle = UITableViewCellSeparatorStyleSingleLineEtched;
+    menu.separatorColor = [UIColor darkGrayColor];
     menu.backgroundColor = [UIColor blueColor];;
     menu.scrollEnabled = NO;
     menu.delegate = self;
@@ -180,6 +184,7 @@ const NSInteger MENU_WIDTH       =  130;
     if ([self.delegate respondsToSelector:@selector(didSelectRowOnIndexPath:withTitle:)]) {
         [self.delegate didSelectRowOnIndexPath:indexPath withTitle:titleItems[[indexPath row]]];
     }
+    [self dismiss];
 }
 
 -(void) initOverLayView
@@ -213,8 +218,9 @@ const NSInteger MENU_WIDTH       =  130;
 
 - (void)fadeOut
 {
+    self.userInteractionEnabled = NO;
     self.alpha = 1.0;
-    [UIView beginAnimations:@"HideArrow" context:nil];
+    [UIView beginAnimations:@"HideMenu" context:nil];
     [UIView setAnimationCurve:UIViewAnimationCurveEaseOut];
     [UIView setAnimationDuration:.45f];
     [UIView setAnimationDelegate: self];
@@ -231,8 +237,8 @@ const NSInteger MENU_WIDTH       =  130;
 
 -(void) dismiss
 {
-    if ([_delegate respondsToSelector:@selector(menuWillDismiss)]) {
-        [_delegate menuWillDismiss];
+    if ([_delegate respondsToSelector:@selector(menuWillDismiss:)]) {
+        [_delegate menuWillDismiss: self];
     }
     isDisplayed = NO;
     
@@ -243,22 +249,22 @@ const NSInteger MENU_WIDTH       =  130;
 -(void)viewDidLayoutSubviews
 {
     if ([menu respondsToSelector:@selector(setSeparatorInset:)]) {
-        [menu setSeparatorInset:UIEdgeInsetsMake(0,0,0,0)];
+        [menu setSeparatorInset:UIEdgeInsetsZero];
     }
     
     if ([menu respondsToSelector:@selector(setLayoutMargins:)]) {
-        [menu setLayoutMargins:UIEdgeInsetsMake(0,0,0,0)];
+        [menu setLayoutMargins:UIEdgeInsetsZero];
     }
 }
 
 -(void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
-        [cell setSeparatorInset:UIEdgeInsetsMake(0,0,0,0)];
+        [cell setSeparatorInset:UIEdgeInsetsZero];
     }
     
     if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
-        [cell setLayoutMargins:UIEdgeInsetsMake(0,0,0,0)];
+        [cell setLayoutMargins:UIEdgeInsetsZero];
     }
 }
 

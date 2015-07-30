@@ -12,7 +12,7 @@
 #define kScreenWidth  [UIScreen mainScreen].bounds.size.width
 #define kScreenHeight [UIScreen mainScreen].bounds.size.height
 
-@interface ViewController ()
+@interface ViewController ()<PLMenuProtocol>
 {
 }
 
@@ -34,10 +34,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UIButton *navRightButton= [UIButton buttonWithType:UIButtonTypeContactAdd];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:navRightButton];
-    [navRightButton addTarget:self action:@selector(showMenu:) forControlEvents:UIControlEventTouchUpInside];
-    _navBar.topItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView: navRightButton];
+    UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 20, kScreenWidth, 44)];
+    [self.view addSubview: navigationBar];
+    
+    UIButton *navButton= [UIButton buttonWithType:UIButtonTypeContactAdd];
+    [navButton addTarget:self action:@selector(showMenu:) forControlEvents:UIControlEventTouchUpInside];
+    navButton.tag = 1001;
+    UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:navButton];
+    
+    UINavigationItem * navigationBarTitle = [[UINavigationItem alloc] initWithTitle:@"PLMenu"];
+    navigationBarTitle.rightBarButtonItem = item;
+    
+    [navigationBar pushNavigationItem: navigationBarTitle animated:YES];
     
     
     UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 120, 40)];
@@ -47,6 +55,7 @@
     [button setTitle:@"显示菜单" forState:UIControlStateNormal];
     [button setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(showMenu:) forControlEvents:UIControlEventTouchUpInside];
+    button.tag = 1002;
     
     [self.view addSubview:button];
 }
@@ -54,7 +63,7 @@
 -(void) showMenu:(UIButton *) sender
 {
     PLMenu *_menu = [[PLMenu alloc] initWithDelegate:self menuItems:@[@"添加好友", @"扫一扫"] images:@[@"nav_bar_user_icon", @"nav_chat_end_relation"]];
-    //[self rotateImage:ANGLE_OF_ROTATE_MENU];
+    _menu.tag = sender.tag;
     [_menu showInView: sender];
 }
 
@@ -63,4 +72,16 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+#pragma mark PLMenuProtocol
+
+-(void) menuWillDismiss:(PLMenu *)menu
+{
+    NSLog(@"----------menuWillDismiss-----------tag=%ld", menu.tag);
+}
+
+- (void) didSelectRowOnIndexPath:(NSIndexPath *)indexPath withTitle:(NSString *) title
+{
+    NSLog(@"----------didSelectRowOnIndexPath-----------row=%ld", [indexPath row]);
+}
 @end

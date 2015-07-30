@@ -10,7 +10,7 @@
 
 @interface ViewController : UIViewController
 
-@property (weak, nonatomic) IBOutlet UINavigationBar *navBar;
+@property (strong, nonatomic) UIView *navBar;
 
 @end
 

@@ -11,11 +11,12 @@
 #define kScreenWidth [UIScreen mainScreen].bounds.size.width
 #define kScreenHeight [UIScreen mainScreen].bounds.size.height
 
+@class PLMenu;
 
-@protocol CSMenuProtocol <NSObject>
+@protocol PLMenuProtocol <NSObject>
 
 @optional
--(void) menuWillDismiss;
+-(void) menuWillDismiss:(PLMenu *)menu;
 
 @required
 - (void) didSelectRowOnIndexPath:(NSIndexPath *)indexPath withTitle:(NSString *) title;
@@ -26,7 +27,7 @@
     UIControl *overlayView;
 }
 
-@property(nonatomic, assign) id<CSMenuProtocol> delegate;
+@property(nonatomic, assign) id<PLMenuProtocol> delegate;
 
 - (instancetype) initWithDelegate:(id)del menuItems:(NSArray *)menuItems selectedItem:(NSString *) selectedItem;
 - (instancetype) initWithDelegate:(id)del menuItems:(NSArray *)menuItems images:(NSArray *) images;

@@ -9,26 +9,14 @@
             <objects>
                 <viewController id="D13-hy-VeE" customClass="ViewController" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="giS-g9-qE4"/>
-                        <viewControllerLayoutGuide type="bottom" id="KYH-ro-DXg"/>
+                        <viewControllerLayoutGuide type="top" id="nSR-GC-b3f"/>
+                        <viewControllerLayoutGuide type="bottom" id="Jf2-5a-YoY"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="udt-ev-ok8">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mAs-dd-qfs">
-                                <rect key="frame" x="0.0" y="20" width="375" height="44"/>
-                                <items>
-                                    <navigationItem title="PLMenu" id="0oI-Wf-yOr"/>
-                                </items>
-                            </navigationBar>
-                        </subviews>
+                    <view key="view" contentMode="scaleToFill" id="ct2-Pd-m4O">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
-                    <connections>
-                        <outlet property="navBar" destination="mAs-dd-qfs" id="YmP-pa-LJy"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="wfc-Jx-Umu" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
