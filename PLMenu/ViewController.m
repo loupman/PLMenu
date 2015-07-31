@@ -64,7 +64,7 @@
 
 -(void) showMenu:(UIButton *) sender
 {
-    PLMenu *_menu = [[PLMenu alloc] initWithDelegate:self menuItems:@[@"添加好友", @"扫一扫"] images:@[@"nav_bar_user_icon", @"nav_chat_end_relation"]];
+    PLMenu *_menu = [[PLMenu alloc] initWithDelegate:self menuItems:@[@"添加好友", @"扫一扫1",@"扫一扫2",@"扫一扫3",@"扫一扫4",@"扫一扫5",@"扫一扫6",@"扫一扫7"] images:@[@"nav_bar_user_icon", @"nav_chat_end_relation", @"nav_chat_end_relation", @"nav_chat_end_relation", @"nav_chat_end_relation", @"nav_chat_end_relation", @"nav_chat_end_relation",@"nav_bar_user_icon"]];
     _menu.tag = sender.tag;
     [_menu showInView: sender];
 }

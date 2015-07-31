@@ -75,10 +75,11 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
 
 -(void) initializer
 {
+    CGFloat maxHeight = MENU_ITEM_HEIGHT * ([titleItems count] > MENU_MAX_ITEM_NUMBER ? MENU_MAX_ITEM_NUMBER : [titleItems count]);
     imgViewSelectedItemCheckMark = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"selected_icon"]];
     imgViewArrow = [[UIImageView alloc] initWithImage: [UIImage imageNamed:@"nav_menu_triangle_icon"]];
     
-    self.frame = CGRectMake(0, 0, MENU_WIDTH, MENU_ITEM_HEIGHT * [titleItems count] + imgViewArrow.image.size.height - 2);
+    self.frame = CGRectMake(0, 0, MENU_WIDTH, maxHeight + imgViewArrow.image.size.height - 2);
     self.layer.masksToBounds = YES;
     self.layer.cornerRadius = 2;
     self.backgroundColor = [UIColor clearColor];
@@ -86,16 +87,15 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
     self.layer.opacity = 0.5;
     self.layer.shadowRadius = 10;
     
-    menu = [[UITableView alloc] initWithFrame:CGRectMake(0, imgViewArrow.image.size.height, MENU_WIDTH, MENU_ITEM_HEIGHT * [titleItems count]) style:UITableViewStyleGrouped];
+    menu = [[UITableView alloc] initWithFrame:CGRectMake(0, imgViewArrow.image.size.height, MENU_WIDTH, maxHeight) style:UITableViewStyleGrouped];
     menu.separatorStyle = UITableViewCellSeparatorStyleSingleLineEtched;
     menu.separatorColor = [UIColor darkGrayColor];
     menu.backgroundColor = [UIColor whiteColor];;
     menu.scrollEnabled = YES;
     if (titleItems && [titleItems count] >= MENU_MAX_ITEM_NUMBER) {
         menu.scrollEnabled = YES;
-        menu.bounces = NO;
-        menu.showsVerticalScrollIndicator = NO;
     }
+    menu.bounces = NO;
     menu.delegate = self;
     menu.dataSource = self;
     menu.layer.masksToBounds = YES;
