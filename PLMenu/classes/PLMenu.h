@@ -28,6 +28,8 @@
 }
 
 @property(nonatomic, assign) id<PLMenuProtocol> delegate;
+@property(nonatomic, assign) BOOL hidesArrowWhenShowMenu;
+@property(nonatomic, assign) NSInteger widthOfMenu;
 //@property(nonatomic, assign) BOOL shouldShowCheckMarkAfterBeingSelected;
 
 
@@ -56,6 +58,7 @@
 - (instancetype) initWithDelegate:(id)delegate menuItems:(NSArray *)menuItems images:(NSArray *) images;
 
 - (void) showInView:(UIView *) view;
+- (void) showCloseInView:(UIView *) view; // 贴近view显示，view和menu之间没有空隙
 - (void) dismiss;
 
 @end

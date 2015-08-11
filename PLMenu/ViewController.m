@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "PLMenu.h"
+#import "PLTriangle.h"
 
 #define kScreenWidth  [UIScreen mainScreen].bounds.size.width
 #define kScreenHeight [UIScreen mainScreen].bounds.size.height
@@ -34,6 +35,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     self.view.backgroundColor = [UIColor lightGrayColor];
     
     UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 20, kScreenWidth, 44)];
@@ -64,9 +66,12 @@
 
 -(void) showMenu:(UIButton *) sender
 {
+    
     PLMenu *_menu = [[PLMenu alloc] initWithDelegate:self menuItems:@[@"添加好友", @"扫一扫1",@"扫一扫2",@"扫一扫3",@"扫一扫4",@"扫一扫5",@"扫一扫6",@"扫一扫7"] images:@[@"nav_bar_user_icon", @"nav_chat_end_relation", @"nav_chat_end_relation", @"nav_chat_end_relation", @"nav_chat_end_relation", @"nav_chat_end_relation", @"nav_chat_end_relation",@"nav_bar_user_icon"]];
     _menu.tag = sender.tag;
-    [_menu showInView: sender];
+    _menu.hidesArrowWhenShowMenu = YES;
+    _menu.widthOfMenu = 200;
+    [_menu showCloseInView: sender];
 }
 
 -(void) showMenu1:(UIButton *) sender
@@ -95,4 +100,5 @@
 {
     NSLog(@"----------didSelectRowOnIndexPath-----------row=%ld", [indexPath row]);
 }
+
 @end

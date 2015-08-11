@@ -8,6 +8,7 @@
 
 #import "PLMenu.h"
 #import "AppDelegate.h"
+#import "PLTriangle.h"
 
 const NSInteger MENU_ITEM_HEIGHT       =  40;
 const NSInteger MENU_WIDTH             =  135;
@@ -21,9 +22,10 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
     NSIndexPath *previousSelectedIndex;
     
     UIImageView *imgViewSelectedItemCheckMark;
-    UIImageView *imgViewArrow;
+    PLTriangle *_arrow;
     
     BOOL isDisplayed;
+    BOOL shouldClose;  //default is NO
 }
 
 - (instancetype) initWithDelegate:(id)delegate menuItems:(NSArray *)menuItems selectedIndex:(NSInteger) index{
@@ -41,7 +43,7 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
         
         [self initializer];
         [self addSubview: menu];
-        [self addSubview:imgViewArrow];
+        [self addSubview: _arrow];
         
         return self;
     }
@@ -65,7 +67,7 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
         
         [self initializer];
         [self addSubview: menu];
-        [self addSubview: imgViewArrow];
+        [self addSubview: _arrow];
         
         return self;
     }
@@ -75,11 +77,18 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
 
 -(void) initializer
 {
+    shouldClose = NO;
     CGFloat maxHeight = MENU_ITEM_HEIGHT * ([titleItems count] > MENU_MAX_ITEM_NUMBER ? MENU_MAX_ITEM_NUMBER : [titleItems count]);
     imgViewSelectedItemCheckMark = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"selected_icon"]];
-    imgViewArrow = [[UIImageView alloc] initWithImage: [UIImage imageNamed:@"nav_menu_triangle_icon"]];
+//    imgViewArrow = [[UIImageView alloc] initWithImage: [UIImage imageNamed:@"nav_menu_triangle_icon"]];
     
-    self.frame = CGRectMake(0, 0, MENU_WIDTH, maxHeight + imgViewArrow.image.size.height - 2);
+    _arrow = [[PLTriangle alloc] initWithFrame:CGRectMake(0, 0, 12, 12)];
+    _arrow.backgroundColor = [UIColor clearColor];
+     UIImage *bg = [[UIImage imageNamed:@"nav_top_bg"] stretchableImageWithLeftCapWidth:0.5 topCapHeight:0.5];
+    _arrow.triangleColor = [UIColor colorWithPatternImage:bg];
+    [self addSubview:_arrow];
+    
+    self.frame = CGRectMake(0, 0, MENU_WIDTH, maxHeight + _arrow.frame.size.height - 2);
     self.layer.masksToBounds = YES;
     self.layer.cornerRadius = 2;
     self.backgroundColor = [UIColor clearColor];
@@ -87,7 +96,7 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
     self.layer.opacity = 0.5;
     self.layer.shadowRadius = 10;
     
-    menu = [[UITableView alloc] initWithFrame:CGRectMake(0, imgViewArrow.image.size.height, MENU_WIDTH, maxHeight) style:UITableViewStyleGrouped];
+    menu = [[UITableView alloc] initWithFrame:CGRectMake(0, _arrow.frame.size.height, MENU_WIDTH, maxHeight) style:UITableViewStyleGrouped];
     menu.separatorStyle = UITableViewCellSeparatorStyleSingleLineEtched;
     menu.separatorColor = [UIColor darkGrayColor];
     menu.backgroundColor = [UIColor whiteColor];;
@@ -104,12 +113,48 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
     [self initOverLayView];
 }
 
+-(void) updateFrame
+{
+    CGFloat maxHeight = MENU_ITEM_HEIGHT * ([titleItems count] > MENU_MAX_ITEM_NUMBER ? MENU_MAX_ITEM_NUMBER : [titleItems count]);
+    CGFloat menuWidth = _widthOfMenu>0?_widthOfMenu:MENU_WIDTH;
+    if (_hidesArrowWhenShowMenu) {
+        _arrow.hidden = YES;
+        self.frame = CGRectMake(0, 0, menuWidth, maxHeight - 2);
+        menu.frame = CGRectMake(0, 0, menuWidth, maxHeight);
+    } else {
+        _arrow.frame = CGRectMake(0, 0, 12, 12);
+        _arrow.hidden = NO;
+        self.frame = CGRectMake(0, 0, menuWidth, maxHeight + _arrow.frame.size.height - 2);
+        menu.frame = CGRectMake(0, _arrow.frame.size.height-0.5, menuWidth, maxHeight);
+    }
+}
+
 - (void) showInView:(UIView *) view
 {
     if (![view respondsToSelector:@selector(frame)]) {
-        NSLog(@"This is component don't have a frame property");
+        NSLog(@"This component don't have a frame property");
         return;
     }
+    shouldClose = NO;
+    
+    [self showWithView:view];
+}
+
+- (void) showCloseInView:(UIView *) view
+{
+    if (![view respondsToSelector:@selector(frame)]) {
+        NSLog(@"This component don't have a frame property");
+        return;
+    }
+    shouldClose = YES;
+    
+    [self showWithView:view];
+}
+
+-(void) showWithView:(UIView *)view
+{
+    [self updateFrame];
+    
     CGFloat marginToRight = 8;
     CGPoint viewRelativePos = [self relativePositionToScreenWithView:view];
     
@@ -118,11 +163,11 @@ const NSInteger MENU_MAX_ITEM_NUMBER   =  6;
     if ((kScreenWidth - viewRelativePos.x) > bounds.size.width) {
         x = viewRelativePos.x + view.bounds.size.width/2 - bounds.size.width/2;
     }
-    CGFloat y = viewRelativePos.y + view.bounds.size.height + imgViewArrow.bounds.size.height;
+    CGFloat y = viewRelativePos.y + view.bounds.size.height+ (shouldClose?0.5:12);
     self.frame = CGRectMake(x, y, bounds.size.width, bounds.size.height);
     
-    CGFloat arrowx = viewRelativePos.x + view.bounds.size.width/2 - x - 12/2;
-    imgViewArrow.frame = CGRectMake(arrowx, 0, 12, 10.5);
+    CGFloat arrowx = viewRelativePos.x + view.bounds.size.width/2 - x - _arrow.bounds.size.width/2;
+    _arrow.frame = CGRectMake(arrowx, 0, _arrow.bounds.size.width, _arrow.bounds.size.height);
     
     isDisplayed = YES;
     [self show];
